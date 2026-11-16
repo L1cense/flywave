@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>flyWave — eVTOL Operations Platform for India</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="vendor/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="css/style.css" />
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three/build/three.module.js",
+  "three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#/">
+    <img src="assets/logo.svg" alt="" class="brand-mark" />
+    <span class="brand-name">FLY<b>WAVE</b></span>
+  </a>
+  <nav class="nav" id="nav">
+    <a href="#/" data-route="dashboard">Mission Control</a>
+    <a href="#/legal" data-route="legal">Regulations</a>
+    <a href="#/planner" data-route="planner">Flight Planner</a>
+    <a href="#/sim" data-route="sim">Simulation Lab</a>
+    <a href="#/hangar" data-route="hangar">Hangar &amp; Logbook</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="clock mono" id="clock">--:--:-- IST</span>
+    <button class="btn btn-ghost btn-sm" id="aiToggle"><span class="ai-dot"></span>Copilot AI</button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<aside class="copilot" id="copilot" aria-hidden="true">
+  <div class="copilot-head">
+    <div>
+      <div class="eyebrow">flyWave AI</div>
+      <div class="copilot-title">Copilot</div>
+    </div>
+    <div class="copilot-actions">
+      <button class="icon-btn" id="aiSettingsBtn" title="AI settings">&#9881;</button>
+      <button class="icon-btn" id="aiClose" title="Close">&times;</button>
+    </div>
+  </div>
+  <div class="copilot-settings hidden" id="aiSettings">
+    <p class="muted small">Copilot runs a built-in aviation knowledge engine offline. Optionally connect an OpenAI-compatible LLM for free-form reasoning. The key stays in this browser only.</p>
+    <label class="field"><span>API base URL</span><input id="aiBase" placeholder="https://api.openai.com/v1" /></label>
+    <label class="field"><span>Model</span><input id="aiModel" placeholder="gpt-4o-mini" /></label>
+    <label class="field"><span>API key</span><input id="aiKey" type="password" placeholder="sk-..." /></label>
+    <div class="row gap"><button class="btn btn-sm" id="aiSave">Save</button><button class="btn btn-ghost btn-sm" id="aiClear">Use offline engine</button></div>
+  </div>
+  <div class="copilot-mode small muted" id="aiMode"></div>
+  <div class="copilot-log" id="aiLog"></div>
+  <div class="copilot-suggest" id="aiSuggest"></div>
+  <form class="copilot-input" id="aiForm">
+    <input id="aiInput" placeholder="Ask about DGCA rules, your plan or sim results…" autocomplete="off" />
+    <button class="btn btn-sm" type="submit">Send</button>
+  </form>
+</aside>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
