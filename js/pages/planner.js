@@ -9,8 +9,11 @@ const ZC = { P:'#ff5c5c', R:'#ffb547', CTR:'#5ad1ff' };
 
 export function mount(view, params){
   const fleet = getFleet();
-  const now = new Date(Date.now()+60*60e3); now.setMinutes(0,0,0);
-  const local = new Date(now.getTime() - now.getTimezoneOffset()*60e3).toISOString().slice(0,16);
+  const IST = 5.5*3600e3;
+  const toIstInput = d => new Date(d.getTime() + IST).toISOString().slice(0,16);
+  const fromIstInput = v => new Date(v + ':00+05:30');
+  const now = new Date(Math.ceil((Date.now()+60*60e3)/3600e3)*3600e3 - 30*60e3);
+  const local = toIstInput(now).slice(0,14) + '00';
   view.innerHTML = `
   <div class="page">
     <div class="page-head">
@@ -102,7 +105,7 @@ export function mount(view, params){
     $('#pGo').disabled = true; $('#pGo').textContent = 'Computing…';
     $('#results').innerHTML = `<div class="card"><div class="eyebrow">AI planner</div><p class="muted">Building route · checking airspace · fetching weather &amp; terrain · budgeting energy…</p><div class="bar"><i style="width:60%;animation:pulse 1s infinite"></i></div></div>`;
     try {
-      plan = await computePlan({ from, to, ac:acSel(), dep:new Date($('#pDep').value), payload:+$('#pPay').value, altFt:+$('#pAlt').value, reserveMin:+$('#pRes').value, soh:+$('#pSoh').value, startSoc:+$('#pSoc').value });
+      plan = await computePlan({ from, to, ac:acSel(), dep:fromIstInput($('#pDep').value), payload:+$('#pPay').value, altFt:+$('#pAlt').value, reserveMin:+$('#pRes').value, soh:+$('#pSoh').value, startSoc:+$('#pSoc').value });
       session.plan = plan; store.set('lastPlan', { title:`${from.name} → ${to.name}`, verdict:plan.verdict, score:plan.score, dist:plan.totalDist, ac:plan.ac.name, brief:plan.brief, findings:plan.findings });
       drawPlan(); renderResults();
     } catch(e){ console.error(e); $('#results').innerHTML = `<div class="card c-bad">Planning failed: ${esc(e.message)}</div>`; }
@@ -151,7 +154,7 @@ export function mount(view, params){
         requestAnimationFrame(()=>lineChart($('#winChart'), [{ data, color:'#5ad1ff', fill:'rgba(90,209,255,.25)' }], { min:0, xlabel:'hours from now → (lower = better)' }));
         const best = p.windows.slice().sort((a,b)=>a.risk-b.risk).slice(0,3);
         $('#winBest').innerHTML = 'Best windows: ' + best.map(b=>`<b class="c-ok">${b.t.toLocaleString('en-IN',{weekday:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'})}</b>`).join(' · ') + ` <button class="btn btn-ghost btn-sm" id="useBest" style="margin-left:8px">Use best</button>`;
-        $('#useBest').onclick = () => { const t = best[0].t; $('#pDep').value = new Date(t.getTime()-t.getTimezoneOffset()*60e3).toISOString().slice(0,13)+':00'; generate(); };
+        $('#useBest').onclick = () => { const t = best[0].t; $('#pDep').value = toIstInput(t).slice(0,14)+'00'; generate(); };
       }
     } else if (tab==='navlog'){
       body.innerHTML = `<div class="card" style="overflow-x:auto"><table><tr><th>#</th><th>From</th><th>To</th><th class="num">Dist km</th><th class="num">TC °</th><th class="num">WCA °</th><th class="num">TH °</th><th class="num">Wind</th><th class="num">GS kt</th><th class="num">Time min</th><th class="num">kWh</th><th class="num">SoC %</th></tr>

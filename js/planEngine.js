@@ -250,7 +250,7 @@ export function aiBrief(plan){
   lines.push(`Route ${p.allPts.length>2 ? `uses ${p.allPts.length-2} intermediate waypoint(s)` : 'is direct'}${p.totalDist > p.directDist*1.02 ? `, ${((p.totalDist/p.directDist-1)*100).toFixed(0)}% longer than great-circle to respect airspace${p.stops.length?' and charging':''}`:''}. Cruise ${p.cruiseFt} ft; highest terrain ${Math.round(p.maxElevFt)} ft.`);
   if (wDep) lines.push(`Weather at departure: ${WMO[wDep.code]||'—'}, ${Math.round(wDep.temp)} °C, wind ${String(Math.round(wDep.dir10)).padStart(3,'0')}°/${Math.round(wDep.wind10)} kt gusting ${Math.round(wDep.gust)} kt, visibility ${wDep.vis>=10?'10+':wDep.vis.toFixed(1)} km. ${wDest?`At destination: ${WMO[wDest.code]||'—'}, gusts ${Math.round(wDest.gust)} kt.`:''} Average ${head>0?'headwind':'tailwind'} component ${Math.abs(head).toFixed(0)} kt.`);
   lines.push(`Energy: ${p.energyRequired.toFixed(1)} kWh needed for the longest sector incl. ${i.reserveMin}-min reserve vs ${p.energyAvailable.toFixed(1)} kWh available; expected arrival SoC <b>${p.arrivalSoc.toFixed(0)}%</b> (reserve ≈ ${p.reserveSoc.toFixed(0)}%).`);
-  if (nogo.length) lines.push(`Blocking issues: ${nogo.map(x=>x.msg).join('; ')}.`);
+  if (nogo.length) lines.push(`Blocking issues: ${nogo.map(x=>x.msg.replace(/\.$/,'')).join('; ')}.`);
   if (caut.length) lines.push(`Watch items: ${caut.slice(0,4).map(x=>x.msg).join('; ')}${caut.length>4?` (+${caut.length-4} more)`:''}.`);
   const best = (p.windows||[]).slice().sort((a,b)=>a.risk-b.risk)[0];
   if (best && p.verdict!=='go') lines.push(`Recommendation: the lowest-risk departure window in the next 36 h is around <b>${best.t.toLocaleString('en-IN',{weekday:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'})} IST</b>.`);
